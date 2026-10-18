@@ -75,7 +75,7 @@ class PrepareTests(unittest.TestCase):
         out = self.d / "out.csv"
         self.assertEqual(run(f, "-o", out).returncode, 0)
         from stamped.data import load_data
-        from stamped.answer import _verdict
+        from stamped.sponsorship import verdict as _verdict
         data = load_data(out)
         self.assertFalse(data.is_placeholder)
         self.assertFalse(data.has_roles)
