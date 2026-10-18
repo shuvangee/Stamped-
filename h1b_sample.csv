@@ -1,0 +1,18 @@
+# PLACEHOLDER DATA: fictional companies and made-up numbers for local testing only. NOT real USCIS data.
+employer,role,year,approvals,denials
+Example Robotics Inc,Software Engineer,2022,40,2
+Example Robotics Inc,Software Engineer,2023,55,3
+Example Robotics Inc,Software Engineer,2024,62,4
+Example Robotics Inc,Data Scientist,2023,12,1
+Placeholder Cloud LLC,Software Engineer,2022,8,1
+Placeholder Cloud LLC,Software Engineer,2023,11,0
+Placeholder Cloud LLC,Software Engineer,2024,9,2
+Placeholder Cloud LLC,Data Scientist,2024,5,0
+Demo Analytics Corp,Data Scientist,2022,30,2
+Demo Analytics Corp,Data Scientist,2023,34,1
+Demo Analytics Corp,Data Scientist,2024,41,2
+Demo Analytics Corp,Software Engineer,2024,3,0
+Sample Retail Group,Software Engineer,2022,6,0
+Sample Retail Group,Data Analyst,2023,2,0
+Fictional Foods Co,Data Scientist,2021,4,0
+Fictional Foods Co,Software Engineer,2021,3,1
