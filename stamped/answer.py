@@ -55,9 +55,10 @@ def _verdict(data: H1BData, company: str, role: str) -> Verdict:
     for f in use:
         by_year[f.year] = by_year.get(f.year, 0) + f.approvals
     history = ", ".join(f"{y}: {n}" for y, n in sorted(by_year.items()))
-    rate = f", approval rate {total / (total + denials):.0%}" if total + denials else ""
+    rate = f", approval rate {total / (total + denials):.0%}" if data.has_denials and total + denials else ""
 
-    if recent_total >= 50 and active_years >= 2:
+    years_in_window = len({f.year for f in data.filings if f.year in recent_years})
+    if recent_total >= 50 and (active_years >= min(2, years_in_window) or recent_total >= 500):
         tier, rank = "✅ Strong sponsor", 4
     elif recent_total >= 10:
         tier, rank = "🟡 Likely sponsor", 3
@@ -68,7 +69,7 @@ def _verdict(data: H1BData, company: str, role: str) -> Verdict:
     else:
         tier, rank = "⚪ No data", 0
 
-    detail = (f"{recent_total} approvals in {latest - 2}–{latest}, {total} total{rate}. "
+    detail = (f"{recent_total} approval{'s' if recent_total != 1 else ''} in {latest - 2}–{latest}, {total} total{rate}. "
               f"By year: {history}.{note}")
     return Verdict(company, matched, tier, rank, detail)
 
@@ -81,6 +82,15 @@ def _fallback_query(text: str, data: H1BData) -> llm.Query:
     """Used when Gemini is unavailable: match known employers/roles by substring."""
     low = f" {norm_company(text)} "
     employers = {f.employer for f in data.filings if f" {norm_company(f.employer)} " in low}
+    # also match a unique, distinctive first word ("amazon" -> "AMAZON.COM SERVICES LLC")
+    firsts: dict[str, set[str]] = {}
+    for f in data.filings:
+        w = norm_company(f.employer).split()[:1]
+        if w and len(w[0]) >= 5:
+            firsts.setdefault(w[0], set()).add(f.employer)
+    for w, names in firsts.items():
+        if len(names) == 1 and f" {w} " in low:
+            employers |= names
     # strip company names so e.g. "Demo Analytics" doesn't look like a role
     rest = text.lower()
     for e in employers:
@@ -115,7 +125,7 @@ def build_answer(text: str) -> str:
 
     out = []
     if data.is_placeholder:
-        out.append("⚠️ **Demo mode: placeholder data.** The numbers below are fictional test data, not real USCIS filings.")
+        out.append("⚠️ **Demo mode: placeholder data.** The numbers below are sample figures for development, not real filings.")
     out.append(f"### H-1B sponsorship check" + (f" — {q.role}" if q.role else ""))
     for v in verdicts:
         name = v.matched or v.company

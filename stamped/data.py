@@ -1,6 +1,7 @@
 """Load H-1B filing history from CSV and look up employers.
 
 CSV columns: employer, role, year, approvals, denials (denials optional).
+Aliases accepted: job_title -> role, filings -> approvals.
 Lines starting with '#' are comments; a comment containing PLACEHOLDER marks
 the file as placeholder data so answers can say so.
 """
@@ -16,6 +17,7 @@ ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PATHS = [ROOT / "data" / "h1b_real.csv", ROOT / "h1b_sample.csv"]
 
 _SUFFIXES = {"inc", "llc", "corp", "corporation", "co", "ltd", "lp", "plc", "company", "incorporated", "limited"}
+_ALIASES = {"job_title": "role", "filings": "approvals"}
 _STOP = {"and", "of", "the", "a", "an", "for", "in", "at"}
 
 
@@ -45,6 +47,10 @@ class H1BData:
     source: str
     is_placeholder: bool
     by_company: dict[str, list[Filing]] = field(default_factory=dict)
+
+    @property
+    def has_denials(self) -> bool:
+        return any(f.denials for f in self.filings)
 
     @property
     def latest_year(self) -> int:
@@ -95,6 +101,7 @@ def load_data(path: str | os.PathLike | None = None) -> H1BData:
 
     filings: list[Filing] = []
     for row in csv.DictReader(lines):
+        row = {_ALIASES.get(k.strip().lower(), k.strip().lower()): v for k, v in row.items() if k}
         try:
             filings.append(Filing(
                 employer=row["employer"].strip(),
