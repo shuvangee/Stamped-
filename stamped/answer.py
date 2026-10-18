@@ -42,7 +42,12 @@ def _verdict(data: H1BData, company: str, role: str) -> Verdict:
     role_rows = data.filter_role(rows, role) if role else []
     scoped = bool(role_rows)
     use = role_rows if scoped else rows
-    note = "" if scoped or not role else f" (no filings under “{role}”; showing all roles)"
+    if scoped or not role:
+        note = ""
+    elif not data.has_roles:
+        note = " (source data is company-level, not split by role)"
+    else:
+        note = f" (no filings under “{role}”; showing all roles)"
 
     latest = data.latest_year
     recent_years = range(latest - 2, latest + 1)

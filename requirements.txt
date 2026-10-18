@@ -1,3 +1,5 @@
 uagents==0.25.5
 google-genai>=2.0,<3
 python-dotenv>=1.0
+# optional: only for reading DOL .xlsx files in scripts/prepare_h1b.py
+# openpyxl>=3.1

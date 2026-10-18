@@ -53,6 +53,11 @@ class H1BData:
         return any(f.denials for f in self.filings)
 
     @property
+    def has_roles(self) -> bool:
+        """False for company-level sources (e.g. USCIS hub) that carry no job titles."""
+        return any(f.role.strip().lower() != "all roles" for f in self.filings)
+
+    @property
     def latest_year(self) -> int:
         return max((f.year for f in self.filings), default=0)
 

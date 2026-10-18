@@ -34,6 +34,19 @@ python agent.py
 ```
 Open the inspector link from the logs, connect the mailbox, then find **stamped** in ASI:One.
 
+## Data (real H-1B numbers)
+Until you add a real file, Stamped uses `h1b_sample.csv`, which is **placeholder data** (replies say so).
+
+1. Download yourself (the scripts never download anything):
+   - **USCIS H-1B Employer Data Hub** export (company-level approvals/denials by fiscal year; no job titles), or
+   - **DOL OFLC LCA disclosure** file (has job titles; counts certified LCAs, a step before petitions). `.xlsx` needs `pip install openpyxl`.
+2. Put it under `data/raw/` (git-ignored), then run:
+   ```bash
+   python scripts/prepare_h1b.py data/raw/<your-file>
+   ```
+3. This writes `data/h1b_real.csv`, which the agent loads automatically in preference to the sample.
+   Run `python -m unittest discover -s tests` to check the converter.
+
 ## Tech
 Fetch.ai uAgents, Agentverse, ASI:One, Agent Chat Protocol, Google Gemini API, pandas.
 
